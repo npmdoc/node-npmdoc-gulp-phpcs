@@ -1,0 +1,212 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/JustBlackBird/gulp-phpcs#readme">gulp-phpcs (v1.4.0)</a>
+</h1>
+<h4>PHP Code Sniffer plugin for Gulp</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-phpcs">module gulp-phpcs</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-phpcs.gulp-phpcs">
+            function <span class="apidocSignatureSpan"></span>gulp-phpcs
+            <span class="apidocSignatureSpan">(options)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-phpcs.reporter">
+            function <span class="apidocSignatureSpan">gulp-phpcs.</span>reporter
+            <span class="apidocSignatureSpan">(name, options)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-phpcs" id="apidoc.module.gulp-phpcs">module gulp-phpcs</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-phpcs.gulp-phpcs" id="apidoc.element.gulp-phpcs.gulp-phpcs">
+        function <span class="apidocSignatureSpan"></span>gulp-phpcs
+        <span class="apidocSignatureSpan">(options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">gulp-phpcs = function (options) {
+    var command = buildCommand(options || {});
+
+    return through.obj(function(file, enc, callback) {
+        var stream = this;
+
+        if (file.isNull()) {
+            stream.push(file);
+            callback();
+
+            return;
+        }
+
+        if (file.isStream()) {
+            stream.emit('error', new gutil.PluginError('gulp-phpcs', 'Streams are not supported'));
+            callback();
+
+            return;
+        }
+
+        runCodeSniffer(command.bin, command.args, file, function(runError, exitCode, output) {
+            if (runError) {
+                // Something is totally wrong. It seems that execution of Code Sniffer
+                // failed (not because of non-zero exit code of PHPCS).
+                stream.emit('error', new gutil.PluginError('gulp-phpcs', runError));
+                callback();
+
+                return;
+            }
+
+            if (exitCode &gt; 1) {
+                // On codding style problems Code Sniffer should exists with "1" code.
+                // All other non-zero exit codes should be treated as Code Sniffer errors.
+                var phpcsError = new gutil.PluginError('gulp-phpcs', 'Execution of Code Sniffer Failed');
+                phpcsError.stdout = output;
+                stream.emit('error', phpcsError);
+                callback();
+
+                return;
+            }
+
+            var report = {
+                error: false,
+                output: ''
+            };
+
+            if (exitCode === 1) {
+                // A codding style problem is found. Attache report to the file to allow
+                // reporters do their job.
+                report.error = true;
+                report.output = output;
+            }
+
+            file.phpcsReport = report;
+            stream.push(file);
+            callback();
+        });
+    });
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-phpcs.reporter" id="apidoc.element.gulp-phpcs.reporter">
+        function <span class="apidocSignatureSpan">gulp-phpcs.</span>reporter
+        <span class="apidocSignatureSpan">(name, options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">reporter = function (name, options) {
+    if (typeof name !== 'string') {
+        throw new gutil.PluginError('gulp-phpcs', 'Reporter name must be a string');
+    }
+
+    if (name === 'index') {
+        throw new gutil.PluginError('gulp-phpcs', 'Reporter cannot be named "index"');
+    }
+
+    var fileName = './' + name + '.js',
+        reporter = null;
+    try {
+        reporter = require(fileName)(options || {});
+    } catch(error) {
+        if (error.code !== 'MODULE_NOT_FOUND') {
+            throw error;
+        }
+
+        throw new gutil.PluginError('gulp-phpcs', 'There is no reporter "' + name + '"');
+    }
+
+    return reporter;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+        // Validate files using PHP Code Sniffer
+        .pipe(phpcs({
+            bin: 'src/vendor/bin/phpcs',
+            standard: 'PSR2',
+            warningSeverity: 0
+        }))
+        // Log all problems that was found
+        .pipe(phpcs.<span class="apidocCodeKeywordSpan">reporter</span>('log'));
+});
+```
+
+
+## API
+
+### phpcs(options)
+...</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
