@@ -1,6 +1,6 @@
 # npmdoc-gulp-phpcs
 
-#### api documentation for  [gulp-phpcs (v1.4.0)](https://github.com/JustBlackBird/gulp-phpcs#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-phpcs.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-phpcs) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-phpcs.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-phpcs)
+#### basic api documentation for  [gulp-phpcs (v1.4.0)](https://github.com/JustBlackBird/gulp-phpcs#readme)  [![npm package](https://img.shields.io/npm/v/npmdoc-gulp-phpcs.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-gulp-phpcs) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-gulp-phpcs.svg)](https://travis-ci.org/npmdoc/node-npmdoc-gulp-phpcs)
 
 #### PHP Code Sniffer plugin for Gulp
 
@@ -77,7 +77,8 @@
         "jshint": "jshint index.js reporters",
         "test": "mocha --recursive test/specs"
     },
-    "version": "1.4.0"
+    "version": "1.4.0",
+    "bin": {}
 }
 ```
 
